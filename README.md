@@ -40,7 +40,7 @@ The operator securely retrieves the API token for email providers from Kubernete
 
 Stay tuned! 🌊 This repository will be populated with the source code, deployment manifests, architecture diagrams, and documentation as development progresses 🏗️.
 
-Architecture Diagram
+### Architecture Diagram
 
 +--------------------+                 +-----------------------+
 | User               |                 | Kubernetes API Server |
