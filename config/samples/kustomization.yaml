@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- emails_v1alpha1_email.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

@@ -1,0 +1,12 @@
+apiVersion: emails.example.com/v1alpha1
+kind: Email
+metadata:
+  labels:
+    app.kubernetes.io/name: email
+    app.kubernetes.io/instance: email-sample
+    app.kubernetes.io/part-of: kmailops
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kmailops
+  name: email-sample
+spec:
+  # TODO(user): Add fields here
