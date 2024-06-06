@@ -33,11 +33,6 @@ type EmailSenderConfig struct {
 	Status EmailSenderConfigStatus `json:"status,omitempty"`
 }
 
-func (in *EmailSenderConfig) DeepCopyInto(out *EmailSenderConfig) {
-	*out = *in
-	out.ObjectMeta.DeepCopyInto(&out.ObjectMeta) // Call DeepCopyInto on ObjectMeta field
-}
-
 // EmailSpec defines the desired state of Email
 type EmailSpec struct {
 	// SenderConfigRef is a reference to the EmailSenderConfig resource

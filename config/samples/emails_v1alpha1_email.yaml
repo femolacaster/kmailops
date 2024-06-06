@@ -7,6 +7,9 @@ metadata:
     app.kubernetes.io/part-of: kmailops
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: kmailops
-  name: email-sample
+  name: my-email  # Name of the Email resource
 spec:
-  # TODO(user): Add fields here
+  senderConfigRef: mailersend-config  # Reference to the EmailSenderConfig resource (replace with actual name)
+  recipientEmail: recipient@example.com  # Email address of the recipient
+  subject: Test Email from Operator  # Subject line of the email
+  body: This is a test email sent from the K8s Email Operator using MailerSend.  # Email body content (can be HTML)
