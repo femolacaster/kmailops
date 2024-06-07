@@ -103,7 +103,7 @@ func (r *EmailReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		}
 	}
 
-	// Handle EmailSenderConfig object (add logic for logging creation/update)
+	//TODO: Handle EmailSenderConfig object (add logic for logging creation/update)
 
 	return ctrl.Result{}, nil
 }

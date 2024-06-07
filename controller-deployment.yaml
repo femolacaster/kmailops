@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kmailops
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kmailops
+  template:
+    metadata:
+      labels:
+        app: kmailops
+    spec:
+      serviceAccountName: email-operator
+      containers:
+      - name: kmailops
+        image: <your-image-name>:<tag>  # Replace with your container image details
+        resources:
+          requests:
+            cpu: 800m
+            memory: 256Mi
+          limits:
+            cpu: 1Gi  # Optional: Define limits if needed
+            memory: 512Mi # Optional: Define limits if needed
