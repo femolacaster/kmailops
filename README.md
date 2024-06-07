@@ -134,6 +134,48 @@ Use advanced statuses to check statuses of the operator
 7. Add more metrics endpoints to code to monitor with kube-prometheus
 8. Version this operator API
 
+## Architecture Diagram
++--------------------+                 +-----------------------+
+| User               |                 | Kubernetes API Server |
++--------------------+                 +-----------------------+
+                     |
+                     | creates/updates CRDs
+                     v
++--------------------+                 +-----------------------+
+| Custom Resource     |                 |      etcd             |
+| Definitions (CRDs) |                 +-----------------------+
+| (YAML files)       |                 |  (cluster state)      |
+| (Email,            |                 +-----------------------+
+|  EmailSenderConfig)|
++--------------------+                 +-----------------------+
+                     |
+                     | watches for changes
+                     v
++--------------------+                 +-----------------------+
+| Kubernetes Operator |                 |  Controller Manager  |
+| (Go application)   |                 +-----------------------+
++--------------------+                 |   (reconciliation     |
+                     |                 |    loop)              |
+                     | interacts with CRDs                     |
+                     v
++--------------------+                 +-----------------------+
+| MailerSend/Mailgun |                 | Email Sending Providers|
+| APIs               |                 | (external services)   |
++--------------------+                 +-----------------------+
+                     |
+                     | sends email based on config
+                     v
++--------------------+                 +-----------------------+
+| Kubernetes Cluster |                 |  Worker Nodes         |
+| (infrastructure)   |                 +-----------------------+
++--------------------+                 |   (run containers)    |
+                     |
++--------------------+
+| Email Application  |  (can be any application 
+| (containers)       |   that needs email sending)
++--------------------+
+
+
 
 ## License
 
@@ -150,4 +192,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
 
