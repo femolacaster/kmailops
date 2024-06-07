@@ -1,23 +1,8 @@
-/*
-Copyright 2024.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controller
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -60,7 +45,7 @@ func (r *EmailReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	if obj.Kind == "Email" {
 		// Get referenced EmailSenderConfig
 		config := &emailsv1alpha1.EmailSenderConfig{}
-		err := r.Get(ctx, types.NamespacedName{Name: obj.Spec.SenderConfigRef, Namespace: obj.Namespace}, obj)
+		err := r.Get(ctx, types.NamespacedName{Name: obj.Spec.SenderConfigRef, Namespace: obj.Namespace}, config)
 		if err != nil {
 			log.Error(err, "Failed to get referenced EmailSenderConfig")
 			return ctrl.Result{}, err
@@ -82,24 +67,27 @@ func (r *EmailReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		var provider interface{}
 		if providerAnnotation, ok := obj.Annotations["email.provider"]; ok {
 			if providerAnnotation == "mailersend" {
-				provider = mailersend.NewMailersend(string(secret.Data["api-key"])) // Assuming key is "api-token" in secret
+				//Decode Base64 for mailersend
+				DecodedApiKey, _ := base64.StdEncoding.DecodeString(string(secret.Data["api-key"]))
+				provider = mailersend.NewMailersend(string(DecodedApiKey)) // Assuming key is "api-token" in secret
 			} else if providerAnnotation == "mailgun" {
 				// Configure Mailgun client with retrieved API key from secret (adjust based on Mailgun library)
-				domain := "your-domain.com"                                           // Replace with your Mailgun domain
+				domain := "sandbox1dfc6dfaaccf44fab156e9088975d38b.mailgun.org"       // Replace with your Mailgun domain
 				provider = mailgun.NewMailgun(domain, string(secret.Data["api-key"])) // Assuming key is "api-key" in secret
 			} else {
 				log.Error(fmt.Errorf("unsupported provider: %s", providerAnnotation), "Invalid email provider specified")
 				return ctrl.Result{}, err
 			}
 		} else {
-			// Use default provider if not specified (replace with your choice)
-			provider = mailersend.NewMailersend(string(secret.Data["api-key"])) // Assuming key is "api-token" in secret
+			// Use default mailgun provider if not specified (replace with your choice)
+			domain := "sandbox1dfc6dfaaccf44fab156e9088975d38b.mailgun.org"       // Replace with your Mailgun domain
+			provider = mailgun.NewMailgun(domain, string(secret.Data["api-key"])) // Assuming key is "api-key" in secret
 		}
 
 		// Send email using chosen provider
 		err = sendEmail(ctx, provider, obj.Spec.RecipientEmail, obj.Spec.Subject, obj.Spec.Body, config.Spec.SenderEmail)
 		if err != nil {
-			log.Error(err, "Failed to send email")
+			log.Error(err, "Failed to Send E-mail")
 			obj.Status.DeliveryStatus = "Failed"
 			obj.Status.Error = err.Error()
 		} else {
@@ -126,7 +114,7 @@ func sendEmail(ctx context.Context, provider interface{}, recipientEmail, subjec
 		// Define recipient details
 		recipients := []mailersend.Recipient{
 			{
-				Name:  "", // Optional recipient name
+				Name:  "Femi", // Optional recipient name
 				Email: recipientEmail,
 			},
 		}
@@ -146,9 +134,16 @@ func sendEmail(ctx context.Context, provider interface{}, recipientEmail, subjec
 
 		// Send the message and handle error
 		_, err := p.Email.Send(ctx, message)
-		return err
+		if err != nil {
+			// Light error handling - Log the error and return a generic message
+			fmt.Println("Error sending email:", err)
+			return err
+		}
 
-	case *mailgun.Mailgun:
+		// Email sent successfully
+		return nil
+
+	case *mailgun.MailgunImpl:
 		// Configure Mailgun message details
 		message := (*p).NewMessage(senderEmail, subject, body, recipientEmail)
 		// Optional: Set additional message details like ReplyTo, CC, BCC
@@ -157,10 +152,17 @@ func sendEmail(ctx context.Context, provider interface{}, recipientEmail, subjec
 		// message.SetBcc("bcc@example.com")
 
 		_, _, err := (*p).Send(ctx, message)
-		return err
+		if err != nil {
+			// Light error handling - Log the error and return a generic message
+			fmt.Println("Error sending email:", err)
+			return err
+		}
+
+		// Email sent successfully
+		return nil
 
 	default:
-		return fmt.Errorf("unsupported provider: %T", provider)
+		return fmt.Errorf("couldn't send mails. provider implementation faulty: %T", provider)
 	}
 }
 

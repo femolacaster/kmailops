@@ -1,0 +1,18 @@
+apiVersion: emails.example.com/v1alpha1
+kind: EmailSenderConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: emailsenderconfig-mailgun
+    app.kubernetes.io/instance: emailsenderconfig-sample
+    app.kubernetes.io/part-of: kmailops
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kmailops
+  name: emailsenderconfig-mailgun  # Name of the Email resource
+spec:
+  # Replace with your Mailgun API token secret name
+  apiTokenSecretRef:
+    name: mailgun-api-token-secret
+    namespace: default  # Replace with the namespace where the secret resides
+
+  # Replace with the email address used for sending emails through Mailgun
+  senderEmail: mailgun@sandbox1dfc6dfaaccf44fab156e9088975d38b.mailgun.org  # Replace with your sender email

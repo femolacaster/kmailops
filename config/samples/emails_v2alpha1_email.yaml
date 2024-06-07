@@ -2,16 +2,16 @@ apiVersion: emails.example.com/v1alpha1
 kind: Email
 metadata:
   labels:
-    app.kubernetes.io/name: email
+    app.kubernetes.io/name: mailer-send-email
     app.kubernetes.io/instance: email-sample
     app.kubernetes.io/part-of: kmailops
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: kmailops
   annotations:  # Add the annotations section
-    email.provider: mailgun # Specify the provider name (lowercase) within the annotation
-  name: my-email  # Name of the Email resource
+    email.provider: mailersend # Specify the provider name (lowercase) within the annotation
+  name: mailer-send-email  # Name of the Email resource
 spec:
-  senderConfigRef: emailsenderconfig-mailgun  # Reference to the EmailSenderConfig resource (replace with actual name)
+  senderConfigRef: emailsenderconfig-mailersend  # Reference to the EmailSenderConfig resource (replace with actual name)
   recipientEmail: femdomsteve@yahoo.com  # Email address of the recipient
   subject: Test Email from Operator  # Subject line of the email
-  body: This is a test email sent from the K8s Email Operator using Mailgun.  # Email body content (can be HTML)
+  body: This is a test email sent from the K8s Email Operator using Mailersend.  # Email body content (can be HTML)

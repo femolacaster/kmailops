@@ -26,3 +26,7 @@ go.work
 *.swp
 *.swo
 *~
+
+# Private idea files
+1-secret.yaml
+2-secret.yaml

@@ -1,8 +1,6 @@
 package v1alpha1
 
 import (
-
-	// MailerSend library (assuming this is needed)
 	k8ssecret "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -31,6 +29,14 @@ type EmailSenderConfig struct {
 
 	Spec   EmailSenderConfigSpec   `json:"spec,omitempty"`
 	Status EmailSenderConfigStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+type EmailSenderConfigList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []EmailSenderConfig `json:"items"`
 }
 
 // EmailSpec defines the desired state of Email
@@ -72,9 +78,17 @@ type Email struct {
 	Status EmailStatus `json:"status,omitempty"`
 }
 
+// +kubebuilder:object:root=true
 type EmailList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Omit the json tag for Items field as metav1.ListMeta already defines it
 	metav1.ListMeta
 	Items []Email `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&Email{})
+	SchemeBuilder.Register(&EmailList{})
+	SchemeBuilder.Register(&EmailSenderConfig{})
+	SchemeBuilder.Register(&EmailSenderConfigList{})
 }
